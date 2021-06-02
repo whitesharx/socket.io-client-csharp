@@ -1,7 +1,6 @@
 ﻿using SocketIOClient.ConnectInterval;
 using SocketIOClient.EioHandler;
 using SocketIOClient.EventArguments;
-using SocketIOClient.JsonSerializer;
 using SocketIOClient.Packgers;
 using SocketIOClient.Response;
 using SocketIOClient.WebSocketClient;
@@ -12,6 +11,7 @@ using System.IO;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using SocketIOClient.JsonSerializer;
 
 namespace SocketIOClient
 {
@@ -140,7 +140,7 @@ namespace SocketIOClient
             Disconnected = true;
             OnDisconnected += SocketIO_OnDisconnected;
             GetConnectInterval = () => new DefaultConnectInterval(Options);
-            JsonSerializer = new SystemTextJsonSerializer(Options.EIO);
+            // JsonSerializer = new SystemTextJsonSerializer(Options.EIO);
         }
 
         /// <summary>

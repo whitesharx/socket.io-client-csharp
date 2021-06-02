@@ -1,9 +1,9 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Newtonsoft.Json.Linq;
 using SocketIOClient.EventArguments;
 using SocketIOClient.Test.Models;
 using System.Collections.Generic;
 using System.Text;
-using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace SocketIOClient.Test.SocketIOTests
@@ -41,7 +41,7 @@ namespace SocketIOClient.Test.SocketIOTests
         [TestMethod]
         public async Task EventAckTest()
         {
-            JsonElement result = new JsonElement();
+            JToken result = null;
             var client = new SocketIO(ConnectAsyncTest.NSP_URL, new SocketIOOptions
             {
                 Reconnection = false,
@@ -61,8 +61,8 @@ namespace SocketIOClient.Test.SocketIOTests
             await Task.Delay(200);
             await client.DisconnectAsync();
 
-            Assert.IsTrue(result.GetProperty("result").GetBoolean());
-            Assert.AreEqual("ack(.net core)", result.GetProperty("message").GetString());
+            Assert.IsTrue(result.Value<bool>("result"));
+            Assert.AreEqual("ack(.net core)", result.Value<string>("message"));
         }
 
         [TestMethod]
@@ -173,7 +173,6 @@ namespace SocketIOClient.Test.SocketIOTests
                     { "token", "io" }
                 }
             });
-            client.JsonSerializer = new MyJsonSerializer(client.Options.EIO);
             client.OnConnected += async (sender, e) =>
             {
                 await client.EmitAsync("change", new

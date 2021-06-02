@@ -5,8 +5,6 @@ using SocketIOClient.Test.Models;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using System.Text.Json;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace SocketIOClient.Test.SocketIOTests
@@ -42,35 +40,6 @@ namespace SocketIOClient.Test.SocketIOTests
         }
 
         [TestMethod]
-        public async Task CancelTextMessageTest()
-        {
-            string result = null;
-            var client = new SocketIO(ConnectAsyncTest.URL, new SocketIOOptions
-            {
-                Reconnection = false,
-                Query = new Dictionary<string, string>
-                {
-                    { "token", "io" }
-                }
-            });
-            client.On("hi", response =>
-            {
-                result = response.GetValue<string>();
-            });
-            client.OnConnected += async (sender, e) =>
-            {
-                var cts = new CancellationTokenSource();
-                cts.Cancel();
-                await client.EmitAsync("hi", cts.Token, ".net core");
-            };
-            await client.ConnectAsync();
-            await Task.Delay(200);
-            await client.DisconnectAsync();
-
-            Assert.IsNull(result);
-        }
-
-        [TestMethod]
         public async Task LongChinessStringTest()
         {
             string teststr = "123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901我的电脑坏了";
@@ -95,7 +64,7 @@ namespace SocketIOClient.Test.SocketIOTests
         [TestMethod]
         public async Task AckTest()
         {
-            JsonElement result = new JsonElement();
+            JToken result = null;
             var client = new SocketIO(ConnectAsyncTest.URL, new SocketIOOptions
             {
                 Reconnection = false,
@@ -115,8 +84,8 @@ namespace SocketIOClient.Test.SocketIOTests
             await Task.Delay(200);
             await client.DisconnectAsync();
 
-            Assert.IsTrue(result.GetProperty("result").GetBoolean());
-            Assert.AreEqual("ack(.net core)", result.GetProperty("message").GetString());
+            Assert.IsTrue(result.Value<bool>("result"));
+            Assert.AreEqual("ack(.net core)", result.Value<string>("message"));
         }
 
         [TestMethod]
@@ -145,64 +114,6 @@ namespace SocketIOClient.Test.SocketIOTests
             await client.DisconnectAsync();
 
             Assert.AreEqual("return all the characters", result);
-        }
-
-        [TestMethod]
-        public async Task NewtonsoftBinaryTest()
-        {
-            string result = null;
-            var client = new SocketIO(ConnectAsyncTest.URL, new SocketIOOptions
-            {
-                Reconnection = false,
-                Query = new Dictionary<string, string>
-                {
-                    { "token", "io" }
-                }
-            });
-            client.JsonSerializer = new Newtonsoft.Json.NewtonsoftJsonSerializer(client.Options.EIO);
-            client.On("binary", response =>
-            {
-                var bytes = response.GetValue<byte[]>();
-                result = Encoding.UTF8.GetString(bytes);
-            });
-            client.OnConnected += async (sender, e) =>
-            {
-                await client.EmitAsync("binary", "return all the characters");
-            };
-            await client.ConnectAsync();
-            await Task.Delay(200);
-            await client.DisconnectAsync();
-
-            Assert.AreEqual("return all the characters", result);
-        }
-
-        [TestMethod]
-        public async Task CancelBinaryMessageTest()
-        {
-            string result = null;
-            var client = new SocketIO(ConnectAsyncTest.URL, new SocketIOOptions
-            {
-                Reconnection = false,
-                Query = new Dictionary<string, string>
-                {
-                    { "token", "io" }
-                }
-            });
-            client.On("binary", response =>
-            {
-                var bytes = response.GetValue<byte[]>();
-                result = Encoding.UTF8.GetString(bytes);
-            });
-            client.OnConnected += async (sender, e) =>
-            {
-                var cts = new CancellationTokenSource();
-                cts.Cancel();
-                await client.EmitAsync("binary", cts.Token, "return all the characters");
-            };
-            await client.ConnectAsync();
-            await Task.Delay(200);
-            await client.DisconnectAsync();
-            Assert.IsNull(result);
         }
 
         [TestMethod]
@@ -271,43 +182,6 @@ namespace SocketIOClient.Test.SocketIOTests
         }
 
         [TestMethod]
-        public async Task CancelAckTest()
-        {
-            ByteResponse result = null;
-            var client = new SocketIO(ConnectAsyncTest.URL, new SocketIOOptions
-            {
-                Reconnection = false,
-                Query = new Dictionary<string, string>
-                {
-                    { "token", "io" }
-                }
-            });
-
-            const string dotNetCore = ".net core";
-            const string client001 = "client001";
-            const string name = "unit test";
-
-            client.OnConnected += async (sender, e) =>
-            {
-                var cts = new CancellationTokenSource();
-                cts.Cancel();
-                await client.EmitAsync("binary ack", cts.Token, response =>
-                {
-                    result = response.GetValue<ByteResponse>();
-                }, name, new
-                {
-                    source = client001,
-                    bytes = Encoding.UTF8.GetBytes(dotNetCore)
-                });
-            };
-            await client.ConnectAsync();
-            await Task.Delay(200);
-            await client.DisconnectAsync();
-
-            Assert.IsNull(result);
-        }
-
-        [TestMethod]
         public async Task EventChangeTest()
         {
             string resVal1 = null;
@@ -320,7 +194,6 @@ namespace SocketIOClient.Test.SocketIOTests
                     { "token", "io" }
                 }
             });
-            client.JsonSerializer = new MyJsonSerializer(client.Options.EIO);
             client.OnConnected += async (sender, e) =>
             {
                 await client.EmitAsync("change", new

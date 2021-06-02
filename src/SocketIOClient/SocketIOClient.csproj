@@ -27,7 +27,16 @@
 
   <ItemGroup>
     <PackageReference Include="System.Collections" Version="4.3.0" />
-    <PackageReference Include="System.Text.Json" Version="5.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\..\..\..\starfall-unity\src\Starfall\Assets\Plugins\Managed\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="JsonConverters" />
   </ItemGroup>
 
 </Project>

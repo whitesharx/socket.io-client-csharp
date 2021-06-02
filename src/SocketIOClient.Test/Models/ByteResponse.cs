@@ -1,16 +1,14 @@
-﻿using System.Text.Json.Serialization;
+﻿using Newtonsoft.Json;
 
 namespace SocketIOClient.Test.Models
 {
     class ByteResponse
     {
-        [JsonPropertyName("clientSource")]
         public string ClientSource { get; set; }
 
-        [JsonPropertyName("source")]
         public string Source { get; set; }
 
-        [JsonPropertyName("bytes")]
+        [JsonProperty("bytes")]
         public byte[] Buffer { get; set; }
     }
 }

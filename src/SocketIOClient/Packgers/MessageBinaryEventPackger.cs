@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text.Json;
+﻿using Newtonsoft.Json.Linq;
+using System;
 
 namespace SocketIOClient.Packgers
 {
@@ -11,7 +9,7 @@ namespace SocketIOClient.Packgers
         public SocketIOResponse Response { get; private set; }
 
         int _totalCount;
-        List<JsonElement> _array;
+        JArray _array;
         public event Action OnEnd;
 
         public void Unpack(SocketIO client, string text)
@@ -33,9 +31,8 @@ namespace SocketIOClient.Packgers
                         id = text.Substring(0, packetIndex);
                         text = text.Substring(packetIndex);
                     }
-                    var doc = JsonDocument.Parse(text);
-                    _array = doc.RootElement.EnumerateArray().ToList();
-                    EventName = _array[0].GetString();
+                    _array = JArray.Parse(text);
+                    EventName = _array[0].ToString();
                     _array.RemoveAt(0);
                     Response = new SocketIOResponse(_array, client);
                     if (int.TryParse(id, out int packetId))

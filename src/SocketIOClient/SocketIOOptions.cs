@@ -1,6 +1,7 @@
 ﻿using SocketIOClient.EioHandler;
 using System;
 using System.Collections.Generic;
+using SocketIOClient.JsonSerializer;
 
 namespace SocketIOClient
 {
@@ -11,6 +12,8 @@ namespace SocketIOClient
             RandomizationFactor = new Random().NextDouble();
             EIO = 3;
         }
+
+        public IJsonSerializer Serializer { get; set; }
 
         public string Path { get; set; } = "/socket.io";
 

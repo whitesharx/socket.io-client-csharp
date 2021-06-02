@@ -1,13 +1,11 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Text.Json;
+﻿using Newtonsoft.Json.Linq;
 
 namespace SocketIOClient.Packgers
 {
     public class MessageBinaryAckPackger : IUnpackable
     {
         int _totalCount;
-        List<JsonElement> _array;
+        JArray _array;
         SocketIOResponse _response;
         int _packetId;
 
@@ -27,8 +25,7 @@ namespace SocketIOClient.Packgers
                     if (int.TryParse(text.Substring(0, packetIndex), out _packetId))
                     {
                         string data = text.Substring(packetIndex);
-                        var doc = JsonDocument.Parse(data);
-                        _array = doc.RootElement.EnumerateArray().ToList();
+                        _array = JArray.Parse(data);
                         if (client.Acks.ContainsKey(_packetId))
                         {
                             _response = new SocketIOResponse(_array, client);

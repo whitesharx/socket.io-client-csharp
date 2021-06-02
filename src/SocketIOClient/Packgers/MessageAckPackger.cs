@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using System.Text.Json;
+﻿using Newtonsoft.Json.Linq;
 
 namespace SocketIOClient.Packgers
 {
@@ -20,10 +19,7 @@ namespace SocketIOClient.Packgers
                 {
                     if (client.Acks.ContainsKey(packetId))
                     {
-                        var doc = JsonDocument.Parse(data);
-                        var array = doc.RootElement.EnumerateArray().ToList();
-                        var response = new SocketIOResponse(array, client);
-                        client.Acks[packetId](response);
+                        client.Acks[packetId](new SocketIOResponse(JArray.Parse(data), client));
                     }
                 }
             }
